@@ -29,9 +29,6 @@ namespace StringExtension
         /// <exception cref="ArgumentOutOfRangeException">
         /// Base should be between 2 and 16.
         /// </exception>
-        /// <exception cref="OverflowException">
-        /// Number greater than int.MaxValue;
-        /// </exception>
         public static int ToDecimal(this string source, int @base)
         {
             ToDecimalInputValidation(source, @base);
@@ -77,7 +74,7 @@ namespace StringExtension
             var currentBase = 1;
             for (int i = numberBits.Length - 1; i >= 0; --i)
             {
-                CheckOverflowException(i, numberBits, @base, currentBase, resultNumber);
+                CheckArgumentException(i, numberBits, @base, currentBase, resultNumber);
 
                 resultNumber += numberBits[i] * currentBase;
                 currentBase *= @base;
@@ -99,7 +96,7 @@ namespace StringExtension
             }
         }
 
-        private static void CheckOverflowException(
+        private static void CheckArgumentException(
             int index, 
             int[] numberBits,
             int @base,
@@ -112,7 +109,7 @@ namespace StringExtension
                     int.MaxValue / currentBase + 1 < @base ||
                     int.MaxValue - resultNumber < numberBits[index] * currentBase)
                 {
-                    throw new OverflowException();
+                    throw new ArgumentException();
                 }
             }
         }
