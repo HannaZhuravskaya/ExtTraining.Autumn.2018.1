@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace StringExtension
 {
@@ -24,60 +23,43 @@ namespace StringExtension
         /// Wrong source number format.
         /// </exception>
         /// <exception cref="ArgumentNullException">
-        /// Number is Null.
+        /// source is null, empty or whitespace string.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// Base should be between 2 and 16.
+        /// base should be between 2 and 16.
         /// </exception>
         public static int ToDecimal(this string source, int @base)
         {
             ToDecimalInputValidation(source, @base);
 
-            var numberBits = new int[source.Length];
-
-            var charToNumber = new Dictionary<char, int>()
-            {
-                {'0', 0},
-                {'1', 1},
-                {'2', 2},
-                {'3', 3},
-                {'4', 4},
-                {'5', 5},
-                {'6', 6},
-                {'7', 7},
-                {'8', 8},
-                {'9', 9},
-                {'A', 10},
-                {'B', 11},
-                {'C', 12},
-                {'D', 13},
-                {'E', 14},
-                {'F', 15}
-            };
-
-            for (int i = 0; i < numberBits.Length; ++i)
-            {
-                if (!charToNumber.ContainsKey(char.ToUpper(source[i])))
-                {
-                    throw new ArgumentException();
-                }
-
-                numberBits[i] = charToNumber[char.ToUpper(source[i])];
-
-                if (numberBits[i] >= @base)
-                {
-                    throw new ArgumentException();
-                }
-            }
+            var charToNumber = "0123456789ABCDEF".Substring(0, @base);
 
             int resultNumber = 0;
             var currentBase = 1;
-            for (int i = numberBits.Length - 1; i >= 0; --i)
+            try
             {
-                CheckArgumentException(i, numberBits, @base, currentBase, resultNumber);
+                for (int i = source.Length - 1; i >= 0; --i)
+                {
+                    var currentDigit = charToNumber.IndexOf(char.ToUpper(source[i]));
 
-                resultNumber += numberBits[i] * currentBase;
-                currentBase *= @base;
+                    if (currentDigit == -1)
+                    {
+                        throw new ArgumentException();
+                    }
+
+                    checked
+                    {
+                        resultNumber += currentDigit * currentBase;
+                        if (i != 0)
+                        {
+                            currentBase *= @base;
+                        } 
+                    }
+                }
+            }
+            catch (OverflowException)
+            {
+                throw new ArgumentException();
             }
 
             return resultNumber;
@@ -85,7 +67,7 @@ namespace StringExtension
 
         private static void ToDecimalInputValidation(string source, int @base)
         {
-            if (source == null)
+            if (string.IsNullOrWhiteSpace(source))
             {
                 throw new ArgumentNullException();
             }
@@ -93,24 +75,6 @@ namespace StringExtension
             if (@base < 2 || @base > 16)
             {
                 throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        private static void CheckArgumentException(
-            int index, 
-            int[] numberBits,
-            int @base,
-            int currentBase,
-            int resultNumber)
-        {
-            if (index != numberBits.Length - 1)
-            {
-                if (
-                    int.MaxValue / currentBase + 1 < @base ||
-                    int.MaxValue - resultNumber < numberBits[index] * currentBase)
-                {
-                    throw new ArgumentException();
-                }
             }
         }
     }
