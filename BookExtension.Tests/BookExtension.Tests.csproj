@@ -58,6 +58,10 @@
       <Project>{a83aba30-cc08-4bbb-876b-50f8217e08b8}</Project>
       <Name>BookExtension</Name>
     </ProjectReference>
+    <ProjectReference Include="..\BookLibrary\BookLibrary.csproj">
+      <Project>{2A12C994-924F-43DE-A680-973FFEB02062}</Project>
+      <Name>BookLibrary</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
